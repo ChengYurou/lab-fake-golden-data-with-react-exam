@@ -14,16 +14,22 @@ const App = React.createClass({
         
         this.setState({elements})
     },
+    onRemove:function (i) {
+        const elements = this.state.elements;
+        elements.splice(i,1);
+
+        this.setState({elements})
+    },
     render: function(){
         var isEditor = this.state.isEditor;
         return (
             <div>
                 <button onClick={this.toogle}>{isEditor?'Preview':'Editor'}</button>
                 <div className={isEditor?'':'hidden'}>
-                    <Editor onAdd ={this.onAdd}/>
+                    <Editor onAdd ={this.onAdd} onRemove ={this.onRemove} elements ={this.state.elements}/>
                 </div>
                 <div className={isEditor?'hidden':''}>
-                    <Preview />
+                    <Preview elements ={this.state.elements} />
                 </div>
             </div>
         )
@@ -36,7 +42,7 @@ const Editor = React.createClass({
         return (
             <div>
                 <div>
-                    <Left/>
+                    <Left elements ={this.props.elements} onRemove={this.props.onRemove}/>
                 </div>
                 <div>
                     <Right onAdd={this.props.onAdd}/>
@@ -47,10 +53,19 @@ const Editor = React.createClass({
 });
 
 const Left = React.createClass({
-   
+
+    remove:function (i) {
+        this.props.onRemove(i)
+    },
     render: function(){
+        const elements = this.props.elements.map((ele,i) => {
+            return <div key={i}>
+                <input type={ele}/>
+                <button onClick={this.remove.bind(this.i)}>x</button>
+            </div>
+        })
         return (
-            <div>Left</div>
+            <div>{elements}</div>
         )
     }   
 });
@@ -75,8 +90,13 @@ const Right = React.createClass({
 const Preview = React.createClass({
 
     render: function(){
+        const elements = this.props.elements.map((ele,i) => {
+            return <div key={i}>
+                <input type={ele}/>
+            </div>
+        })
         return (
-            <div>Preview</div>
+            <div>{elements}</div>
         )
     }
 });
